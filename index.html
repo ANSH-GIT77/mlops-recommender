@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Recommendation Dashboard</title>
+
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 30px;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #00ffcc;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .card {
+            margin: 20px auto;
+            padding: 20px;
+            width: 60%;
+            background: #1e1e1e;
+            border-radius: 10px;
+        }
+
+        #logs {
+            text-align: left;
+            max-height: 200px;
+            overflow-y: scroll;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎬 AI Recommendation Dashboard</h1>
+
+    <div class="card">
+        <input type="number" id="userId" placeholder="Enter User ID">
+        <button onclick="getRecommendations()">Get Recommendations</button>
+    </div>
+
+    <div class="card">
+        <h3>📌 Recommendations</h3>
+        <p id="result"></p>
+    </div>
+
+    <div class="card">
+        <h3>📊 Total Requests</h3>
+        <p id="stats"></p>
+    </div>
+
+    <div class="card">
+        <h3>🧾 Logs</h3>
+        <div id="logs"></div>
+    </div>
+
+<script>
+const BASE_URL = "http://127.0.0.1:8000";
+
+async function getRecommendations() {
+    const userId = document.getElementById("userId").value;
+
+    const response = await fetch(`${BASE_URL}/recommend?user_id=${userId}`);
+    const data = await response.json();
+
+    document.getElementById("result").innerText = data.recommendations;
+
+    loadStats();
+    loadLogs();
+}
+
+async function loadStats() {
+    const response = await fetch(`${BASE_URL}/stats`);
+    const data = await response.json();
+
+    document.getElementById("stats").innerText = data.total_requests;
+}
+
+async function loadLogs() {
+    const response = await fetch(`${BASE_URL}/logs`);
+    const data = await response.json();
+
+    let logsHtml = "";
+    data.logs.reverse().forEach(log => {
+        logsHtml += `<p>${log}</p>`;
+    });
+
+    document.getElementById("logs").innerHTML = logsHtml;
+}
+</script>
+
+</body>
+</html>
